@@ -106,6 +106,50 @@ function handleFeedback(correct) {
 	// Clarence again clicks the ">" on the right side of the box. 
 	// He again sees the page counter has incremented. He sees his new score too: +1/-1
 	console.log("handleFeedback ran")
+
+	let qNum = userData.question;
+	let question = qBank[qNum];
+	let answers = $('.answer');
+	const contextFeedback = {}
+	// set appropriate feedback and adjust score
+	if (correct) {
+		contextFeedback.primary = 'Correct!';
+		contextFeedback.secondary = "Congratulations on your useless knowledge!";
+		userData.posScore += 1; 
+	} else {
+		contextFeedback.primary = 'Incorrect!';
+		contextFeedback.secondary = "We thought you were an expert on that stuff!"
+		userData.negScore += 1;
+	}
+
+	// redraw footer to display updated score
+	$('footer').remove()
+	createFooter()
+	
+	// add feedback box
+	$('.quizBox').append(`
+		<div class="feedbackForm">					
+			<p><span class="primaryFeedback">${contextFeedback.primary} </span><span class="secondaryFeedback">${contextFeedback.secondary}</span></p>										
+		</div>
+		`)
+
+	// give it the appropriate class
+	if (correct) {
+		$('feedbackForm').addClass("correct")
+	} else {
+		$('feedbackForm').addClass("incorrect")
+	}
+
+	// animate answers hinging out
+	for (let i=0;i<Object.keys(answers).length;i++) {
+		let ansBut = answers[i];		
+		let answer = $(ansBut).text();
+		console.log(answer);
+		if (question.isCorrect(answer)) {			
+		} else {
+			$(ansBut).addClass("animated hinge")
+		};
+	}		
 }
 
 function handleFinal() {
