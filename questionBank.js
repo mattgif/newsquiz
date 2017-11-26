@@ -42,7 +42,7 @@ const questionList = [
 	{qText: "To raise money for low-income New York City immigrants, New York City cabbies did what?",
 	correctAnswer: "Posed for a provocative pinup calendar",
 	wrong1: "Sold dishes from their home countries, cooked by the heat of a running cab engine",
-	wrong2: "Raffled a chanced to win $1000 by “guessing that smell” in the backseat",
+	wrong2: "Raffled a chanced to win $1000 by \"guessing that smell\" in the backseat",
 	wrong3: "Sold a book of poems, composed entirely from the rambling of drunk passengers",
 	},
 	{qText: "When police in Casper, Wyo. arrested a man for public intoxication, he defended himself by claiming what?",
@@ -104,6 +104,10 @@ function question(quesText,correctAnswer,wrong1,wrong2,wrong3) {
 // generate and shuffle question bank
 function buildQBank(questionList) {
 	console.log('Building Question Bank')
+	// empty the qBank
+	questionBank.length = 0
+	// iterate over items in the question LIST, turn them into question objects, and append to the qBank
+	// we're doing this to get the associated methods added to each question in the list
 	for (let i = 0; i<questionList.length; i++) {
 		q = question(questionList[i].qText,questionList[i].correctAnswer,questionList[i]['wrong1'],questionList[i]['wrong2'],questionList[i]['wrong3'])
 		questionBank.push(q)

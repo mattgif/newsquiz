@@ -44,6 +44,14 @@ legend {
 	width: 100%;
 }
 
+footer {
+	display: flex;
+}
 .score {
+	flex: 1;
 	text-align: right;
+}
+
+.pageCount {
+	flex: 0 0 50%;
 }
