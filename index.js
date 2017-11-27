@@ -18,8 +18,8 @@ function setLegend (legendText) {
 function handleFirstVisit() {
 	// clear out anything that might already be in quizbox
 	$('.answerForm').empty()
-	setLegend("Ready to test your knowledge about the strange world you live in?")	
-	$('.answerForm').append('<button class=\"startButton js-nextButton\">Let\'s go!</button>')
+	setLegend("You live in a weird world! Ready to find out how much you know about it?")	
+	$('.answerForm').append('<div class=startButton><button class=\"startButton js-nextButton\">Let\'s go!</button></div>')
 }
 
 // Handles actions when next/start are clicked
@@ -55,7 +55,7 @@ function createFooter() {
 				<p>Question ${userData.question} of ${userData.totalQuestions}</p>	
 			</div>		
 			<div class="score">
-				<span class="posScore">+${userData.posScore}</span>/<span class="negScore">-${userData.negScore}</span>
+				<span class="posScore">+${userData.posScore}</span>  <span class="negScore">-${userData.negScore}</span>
 			</div>
 		</footer>
 		`);						
@@ -63,8 +63,7 @@ function createFooter() {
 
 function cleanup() {
 	$('.answerForm').empty();
-	$('footer').remove();
-	$('.feedbackForm').remove();
+	$('footer').remove();	
 	$('.nextButton').remove();
 }
 
@@ -112,17 +111,20 @@ function handleFeedback(correct) {
 	createFooter()
 
 	// add feedback box
-	$('.quizBox').append(`
-		<div class="feedbackForm">					
-			<p><span class="primaryFeedback">${contextFeedback.primary} </span><span class="secondaryFeedback">${contextFeedback.secondary}</span></p>										
+	$('legend').after(`
+		<div class="feedbackForm">			
+			<p><span class="primaryFeedback">${contextFeedback.primary} </span><span class="secondaryFeedback">${contextFeedback.secondary}</span></p>			
 		</div>
+		<div class="nextButton js-nextButton">
+			<button>next \></button>
+		</div>										
 		`)
 
 	// give it the appropriate class
 	if (correct) {
-		$('feedbackForm').addClass("correct")
+		$('.feedbackForm').addClass("correct")
 	} else {
-		$('feedbackForm').addClass("incorrect")
+		$('.feedbackForm').addClass("incorrect")
 	}
 
 	// animate answers hinging out
@@ -134,14 +136,10 @@ function handleFeedback(correct) {
 			$(ansBut).addClass("animated hinge")
 		};
 	}
-
-	// add next button
-	$('.quizBox').append(`<div class="nextButton js-nextButton"><button>next ></button></div>`)
 }
 
 // Renders a summary page with user score and start over button
-function handleFinal() {	
-	console.log("handleFinal ran")
+function handleFinal() {		
 	cleanup()
 
 	// checks if we need to pluralize 'question'
@@ -155,8 +153,11 @@ function handleFinal() {
 	}	
 	$('.answerForm').append(`
 		<legend>OK, let's see how you did:</legend>
-		<h3>You got ${positiveScore} correct,</h3>
-		<h3>and ${negativeScore} incorrect</h3>
+		<div class="finalScore">
+			<p>You got:</p>
+			<p class="posScore">    ${positiveScore} correct</p>
+			<p class="negScore">    ${negativeScore} incorrect</p>			
+		</div>
 		<button class="resetButton">Start over?</button>
 		`)
 
