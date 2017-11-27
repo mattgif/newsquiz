@@ -5,8 +5,9 @@ const qBank = questionBank
 const userData = {
 	question: 0,
 	posScore: 0,
-	negScore: 0,
-	totalQuestions: 10
+	negScore: 0,	
+	totalQuestions: 10,
+	showFeedback: 1,
 }
 
 // Sets the field used to display questions and prompts
@@ -25,11 +26,13 @@ function handleFirstVisit() {
 // Handles actions when next/start are clicked
 function handleNextButton() {	
 	$('.quizBox').on('click', '.js-nextButton', event => {		
-		// checks to see if user has seen all questions
+		// checks to see if user has seen all questions		
 		if (userData.question >= userData.totalQuestions) {
 		handleFinal();
 		} else {
 		userData.question += 1;
+		// toggles feedback display so new feedback elements will appear
+		userData.showFeedback = 1;
 		handleNewQuestion();
 		};
 	})	
@@ -37,20 +40,26 @@ function handleNextButton() {
 
 // listener for answer buttons
 function handleAnswerClicked() {		
-	$('.answerForm').on('click','.answer', e=> {		
-		let selectedAnswer = $(e.target).text()		
-		let qNum = userData.question;
-		let question = qBank[qNum-1];
-		// sets correct to 1 or 0 depending on whether the answer is correct
-		let correct = question.isCorrect(selectedAnswer);		
-		handleFeedback(correct);
+	$('.answerForm').on('click','.answer', e=> {
+		// checks to see if feedback already displayed
+		if (userData.showFeedback) {
+			userData.showFeedback = 0;
+			let selectedAnswer = $(e.target).text()		
+			let qNum = userData.question;
+			let question = qBank[qNum-1];
+			// sets correct to 1 or 0 depending on whether the answer is correct
+			let correct = question.isCorrect(selectedAnswer);
+			$(e.target).addClass('selected');
+			handleFeedback(correct);
+		}		
 	});
 }
 
 // creates the footer with question number and current score
 function createFooter() {	
-	$('.answerForm').append(`
-		<footer>				
+	$('.answerForm').append(
+		`
+		<footer role="contentinfo">				
 			<div class="pageCount">
 				<p>Question ${userData.question} of ${userData.totalQuestions}</p>	
 			</div>		
@@ -58,7 +67,8 @@ function createFooter() {
 				<span class="posScore">+${userData.posScore}</span>  <span class="negScore">-${userData.negScore}</span>
 			</div>
 		</footer>
-		`);						
+		`
+	);						
 }
 
 function cleanup() {
@@ -69,9 +79,6 @@ function cleanup() {
 
 // Renders new question, answers, score, and page count
 function handleNewQuestion() {
-	// To the right of that, he sees his current score: +0/-0, with the plusses and minuses in large playful fonts, colored green and red respectively. 
-	// Hovering his mouse over a button, Clarence notices it changes color
-	
 	// clear previous items
 	cleanup()
 	let qNum = userData.question;
@@ -111,14 +118,14 @@ function handleFeedback(correct) {
 	createFooter()
 
 	// add feedback box
-	$('legend').after(`
-		<div class="feedbackForm">			
+	$('legend').after(
+		`<div class="feedbackForm">			
 			<p><span class="primaryFeedback">${contextFeedback.primary} </span><span class="secondaryFeedback">${contextFeedback.secondary}</span></p>			
 		</div>
 		<div class="nextButton js-nextButton">
 			<button>next \></button>
-		</div>										
-		`)
+		</div>`
+	)
 
 	// give it the appropriate class
 	if (correct) {
@@ -133,7 +140,11 @@ function handleFeedback(correct) {
 		let answer = $(ansBut).text();		
 		if (question.isCorrect(answer)) {			
 		} else {
-			$(ansBut).addClass("animated hinge")
+			$(ansBut).addClass("animated hinge");
+			// waits for animation to complete, then removes item (helps keyboardusers avoid offscreen buttons)
+			setTimeout(function(){
+				$(ansBut).remove();	
+			},3000)			
 		};
 	}
 }
@@ -151,15 +162,15 @@ function handleFinal() {
 	if (userData.negscore !=1) {
 		negativeScore += 's'
 	}	
-	$('.answerForm').append(`
-		<legend>OK, let's see how you did:</legend>
+	$('.answerForm').append(
+		`<legend>OK, let's see how you did:</legend>
 		<div class="finalScore">
 			<p>You got:</p>
 			<p class="posScore">    ${positiveScore} correct</p>
 			<p class="negScore">    ${negativeScore} incorrect</p>			
 		</div>
-		<button class="resetButton">Start over?</button>
-		`)
+		<button class="resetButton">Start over?</button>`		
+	)
 
 	// handle startover
 	$('.resetButton').click(e => {
