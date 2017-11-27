@@ -9,27 +9,22 @@ const userData = {
 	totalQuestions: 10
 }
 
-function setLegend (legendText) {
-	// Sets the field used to display questions and prompts
+// Sets the field used to display questions and prompts
+function setLegend (legendText) {	
 	$('.answerForm').append(`<legend>${legendText}</legend>`)
 }
 
+// Renders the start screen for users' initial landing
 function handleFirstVisit() {
-	// Renders the start screen for users' initial landing
-	// Clarence sees a prompt asking him if he wants to begin, with a large 'Start' button.
-	// Intrigued, Clarence clicks the button.
-	console.log("handleFirstVisit ran");
 	// clear out anything that might already be in quizbox
 	$('.answerForm').empty()
 	setLegend("Ready to test your knowledge about the strange world you live in?")	
 	$('.answerForm').append('<button class=\"startButton js-nextButton\">Let\'s go!</button>')
 }
 
-function handleNextButton() {
-	// Handles actions when next/start are clicked
-	
-	$('.answerForm').on('click', '.js-nextButton', event => {
-		console.log('Next button clicked')
+// Handles actions when next/start are clicked
+function handleNextButton() {	
+	$('.quizBox').on('click', '.js-nextButton', event => {		
 		// checks to see if user has seen all questions
 		if (userData.question >= userData.totalQuestions) {
 		handleFinal();
@@ -37,25 +32,23 @@ function handleNextButton() {
 		userData.question += 1;
 		handleNewQuestion();
 		};
-	})
-	
+	})	
 }
 
-function handleAnswerClicked() {	
-	// listener for answer buttons
-	$('.answerForm').on('click','.answer', e=> {
-		console.log("Answer clicked");
+// listener for answer buttons
+function handleAnswerClicked() {		
+	$('.answerForm').on('click','.answer', e=> {		
 		let selectedAnswer = $(e.target).text()		
 		let qNum = userData.question;
-		let question = qBank[qNum];
+		let question = qBank[qNum-1];
 		// sets correct to 1 or 0 depending on whether the answer is correct
 		let correct = question.isCorrect(selectedAnswer);		
 		handleFeedback(correct);
 	});
 }
 
-function createFooter() {
-	// creates the footer with question number and current score
+// creates the footer with question number and current score
+function createFooter() {	
 	$('.answerForm').append(`
 		<footer>				
 			<div class="pageCount">
@@ -68,18 +61,22 @@ function createFooter() {
 		`);						
 }
 
+function cleanup() {
+	$('.answerForm').empty();
+	$('footer').remove();
+	$('.feedbackForm').remove();
+	$('.nextButton').remove();
+}
+
+// Renders new question, answers, score, and page count
 function handleNewQuestion() {
-	// Renders new question, answers, score, and page count
-	// The prompt is replaced by a question about strange events in the news.
-	// Below that, Clarence sees four buttons labeled with different answers.
-	// At the very bottom in the left, Clarence sees a counter indicating what question he is on: "Question 1 of 10" it says.
 	// To the right of that, he sees his current score: +0/-0, with the plusses and minuses in large playful fonts, colored green and red respectively. 
 	// Hovering his mouse over a button, Clarence notices it changes color
-	console.log("handleNewQuestion ran");
+	
 	// clear previous items
-	$('.answerForm').empty()
+	cleanup()
 	let qNum = userData.question;
-	let question = qBank[qNum];
+	let question = qBank[qNum-1];
 	let answers = question.generateAnswers()	
 	// grabs the question at qNum index and sets the question text to qText
 	setLegend(question.qText);
@@ -93,39 +90,27 @@ function handleNewQuestion() {
 	createFooter();
 }
 
-function handleFeedback(correct) {
-	// Listens for user input and generates feedback 
-	// Clarence clicks a button, and sees all of the wrong answers fall away from the screen. His choice was among them.
-	// He sees a red box below the quiz box that says "Incorrect!" in big letters, and displays some humorous text. 
-	// He sees a pulsing ">" arrow on the right side of the box, inviting him to continue.
-	// He clicks it. The question is replaced with a new question, and four fresh choices. 
-	// At the bottom he notices the page counter has increased.
-	// To the right of that, he sees his new score: +0/-1
-	// He makes a selection. The incorrect answers fall away. What joy, his is not among them!
-	// Below the quiz block is a green box that says "Yes, but why do you know that?", and displays some humorous text.
-	// Clarence again clicks the ">" on the right side of the box. 
-	// He again sees the page counter has incremented. He sees his new score too: +1/-1
-	console.log("handleFeedback ran")
-
+// Listens for user input and generates feedback
+function handleFeedback(correct) {	 	
 	let qNum = userData.question;
-	let question = qBank[qNum];
+	let question = qBank[qNum-1];
 	let answers = $('.answer');
 	const contextFeedback = {}
 	// set appropriate feedback and adjust score
 	if (correct) {
 		contextFeedback.primary = 'Correct!';
-		contextFeedback.secondary = "Congratulations on your useless knowledge!";
+		contextFeedback.secondary = "";
 		userData.posScore += 1; 
 	} else {
 		contextFeedback.primary = 'Incorrect!';
-		contextFeedback.secondary = "We thought you were an expert on that stuff!"
+		contextFeedback.secondary = ""
 		userData.negScore += 1;
 	}
 
 	// redraw footer to display updated score
 	$('footer').remove()
 	createFooter()
-	
+
 	// add feedback box
 	$('.quizBox').append(`
 		<div class="feedbackForm">					
@@ -143,18 +128,46 @@ function handleFeedback(correct) {
 	// animate answers hinging out
 	for (let i=0;i<Object.keys(answers).length;i++) {
 		let ansBut = answers[i];		
-		let answer = $(ansBut).text();
-		console.log(answer);
+		let answer = $(ansBut).text();		
 		if (question.isCorrect(answer)) {			
 		} else {
 			$(ansBut).addClass("animated hinge")
 		};
-	}		
+	}
+
+	// add next button
+	$('.quizBox').append(`<div class="nextButton js-nextButton"><button>next ></button></div>`)
 }
 
-function handleFinal() {
-	// Renders a summary page with user score and start over button
+// Renders a summary page with user score and start over button
+function handleFinal() {	
 	console.log("handleFinal ran")
+	cleanup()
+
+	// checks if we need to pluralize 'question'
+	let positiveScore = userData.posScore + ' question';
+	let negativeScore = userData.negScore + ' question';
+	if (userData.posScore != 1) {
+		positiveScore += 's'
+	};
+	if (userData.negscore !=1) {
+		negativeScore += 's'
+	}	
+	$('.answerForm').append(`
+		<legend>OK, let's see how you did:</legend>
+		<h3>You got ${positiveScore} correct,</h3>
+		<h3>and ${negativeScore} incorrect</h3>
+		<button class="resetButton">Start over?</button>
+		`)
+
+	// handle startover
+	$('.resetButton').click(e => {
+		userData.posScore = 0;
+		userData.negscore = 0;
+		userData.question = 0;
+		handleFirstVisit();
+	})
+
 }
 
 function handleQuiz() {

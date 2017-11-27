@@ -56,6 +56,11 @@ footer {
 	flex: 0 0 50%;
 }
 
+.nextButton {
+	display: flex;
+	justify-content: flex-end;
+}
+
 /*animation for wrong answers*/
 @keyframes hinge {
    0% { 

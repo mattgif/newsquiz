@@ -102,8 +102,7 @@ function question(quesText,correctAnswer,wrong1,wrong2,wrong3) {
 }
 
 // generate and shuffle question bank
-function buildQBank(questionList) {
-	console.log('Building Question Bank')
+function buildQBank(questionList) {	
 	// empty the qBank
 	questionBank.length = 0
 	// iterate over items in the question LIST, turn them into question objects, and append to the qBank
