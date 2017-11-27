@@ -173,3 +173,16 @@ footer {
       opacity: 0; 
    } 
 } 
+
+.animated.hinge {
+  animation-duration: 3s;
+}
+
+.animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.hinge {
+  animation-name: hinge;
+}
